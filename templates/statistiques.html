@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="study-card">
+            <div class="card-body">
+                <h2><i class="bi bi-graph-up"></i> Mes Statistiques</h2>
+                <p class="text-muted">Suivez votre progression</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="study-card">
+            <div class="card-body">
+                <h5>Sessions des 7 derniers jours</h5>
+                {% if sessions_data %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sessions</th>
+                            <th>Progression</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in sessions_data %}
+                        <tr>
+                            <td>{{ data.date }}</td>
+                            <td>{{ data.count }} sessions</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ (data.count / 10 * 100) }}%">
+                                        {{ (data.count / 10 * 100) | round }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">Aucune donnée disponible</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="study-card">
+            <div class="card-body text-center">
+                <h5>Résumé</h5>
+                <div class="display-4 text-primary">{{ sessions_data | length }}</div>
+                <p class="text-muted">Jours actifs cette semaine</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
