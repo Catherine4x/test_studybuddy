@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="study-card text-center p-4 mb-4">
+            <h2>Minuteur d'Étude</h2>
+            <div class="timer-display my-4" id="timer">25:00</div>
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5>Choisissez une méthode :</h5>
+                    <div class="row" id="methodSelection">
+                        {% for methode in methodes %}
+                        <div class="col-md-6 mb-2">
+                            <div class="study-card method-card p-3" data-method-id="{{ methode.id }}" 
+                                 data-duration="{{ methode.duree_session }}">
+                                <h6>{{ methode.nom }}</h6>
+                                <small class="text-muted">{{ methode.duree_session }}min / {{ methode.duree_pause }}min</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="btn btn-success btn-lg" id="startBtn">
+                    <i class="bi bi-play-circle"></i> Démarrer
+                </button>
+                <button class="btn btn-warning btn-lg" id="pauseBtn" disabled>
+                    <i class="bi bi-pause-circle"></i> Pause
+                </button>
+                <button class="btn btn-danger btn-lg" id="resetBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let timer;
+let timeLeft = 25 * 60;
+let isRunning = false;
+let selectedDuration = 25;
+
+document.querySelectorAll('.method-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.method-card').forEach(c => c.style.border = 'none');
+        this.style.border = '2px solid #4e73df';
+        selectedDuration = parseInt(this.dataset.duration);
+        timeLeft = selectedDuration * 60;
+        updateTimer();
+    });
+});
+
+function updateTimer() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    document.getElementById('timer').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+document.getElementById('startBtn').addEventListener('click', function() {
+    if (!isRunning) {
+        isRunning = true;
+        timer = setInterval(function() {
+            timeLeft--;
+            updateTimer();
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                isRunning = false;
+                alert('Session terminée ! Prenez une pause.');
+            }
+        }, 1000);
+    }
+});
+
+document.getElementById('pauseBtn').addEventListener('click', function() {
+    if (isRunning) {
+        clearInterval(timer);
+        isRunning = false;
+    }
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+    clearInterval(timer);
+    isRunning = false;
+    timeLeft = selectedDuration * 60;
+    updateTimer();
+});
+
+// Sélectionner la première méthode par défaut
+document.querySelector('.method-card').click();
+</script>
+{% endblock %}
